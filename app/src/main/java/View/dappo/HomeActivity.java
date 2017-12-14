@@ -7,6 +7,8 @@ package dbde.dappo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import dbde.dappo.R;
+
 public class HomeActivity extends AppCompatActivity {
 
     @Override
