@@ -2,12 +2,10 @@
 DAPPO - DasAudioPlayerWithPhotoOption
 DBDE  - DasBestDevelopmentEver
  */
-package dbde.dappo;
+package View.dappo;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import dbde.dappo.R;
 
 public class HomeActivity extends AppCompatActivity {
 

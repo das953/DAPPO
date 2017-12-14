@@ -1,4 +1,4 @@
-package dbde.dappo;
+package View.dappo;
 
 import org.junit.Test;
 

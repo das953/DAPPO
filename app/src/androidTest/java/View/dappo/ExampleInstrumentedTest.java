@@ -1,4 +1,4 @@
-package dbde.dappo;
+package View.dappo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("dbde.dappo", appContext.getPackageName());
+        assertEquals("View.dappo", appContext.getPackageName());
     }
 }
