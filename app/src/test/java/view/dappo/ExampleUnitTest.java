@@ -1,4 +1,4 @@
-package View.dappo;
+package view.dappo;
 
 import org.junit.Test;
 

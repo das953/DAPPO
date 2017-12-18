@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DAPPO</string>
+    <string name="Hello">Hello World!</string>
 </resources>
