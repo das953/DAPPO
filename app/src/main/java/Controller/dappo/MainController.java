@@ -1,5 +1,8 @@
 package Controller.dappo;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadata;
@@ -20,6 +23,7 @@ import java.util.Map;
 
 
 import Model.dappo.AppSettings;
+import Model.dappo.DbContext;
 import Model.dappo.Soundtrack;
 
 /**
@@ -32,12 +36,15 @@ public class MainController {
     private ArrayList<String> fileNames;
     private ArrayList<String> playsistsNames;
     private Map<String , ArrayList<Soundtrack>> playLists;
+    private Context context;
 
 
-    public MainController() {
+    public MainController(Context context) {
+        this.context = context;
 
         Initialize();
         //TODO get lang string from DB if it exist
+        DataController.Initialize(context);
 
 
     }

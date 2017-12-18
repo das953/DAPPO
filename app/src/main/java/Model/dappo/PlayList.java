@@ -6,14 +6,15 @@ import java.util.ArrayList;
  * Created by das953 on 18-Dec-17.
  */
 
-public class PlayList extends ArrayList<String> {
-    private String[] fileNames;
+public class PlayList<Soundtrack> extends ArrayList<Soundtrack> {
 
-    public String[] getFileNames() {
-        return fileNames;
+    private String listName;
+
+    public String getListName() {
+        return listName;
     }
 
-    public void setFileNames(String[] fileNames) {
-        this.fileNames = fileNames;
+    public PlayList(String listName) {
+        this.listName = listName;
     }
 }

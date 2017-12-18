@@ -1,18 +1,28 @@
 package Controller.dappo;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadata;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import Model.dappo.DbContext;
+import Model.dappo.PlayList;
 import Model.dappo.Soundtrack;
 
 /**
@@ -22,55 +32,77 @@ import Model.dappo.Soundtrack;
 public final class DataController {
 
 
-    private static Map<String , ArrayList<Soundtrack>> playLists;
+    private static Map<String , PlayList<Soundtrack>> playLists;
     private static ArrayList<String> fileNames;
     private static ArrayList<String> playsistsNames;
-    private static ArrayList<Soundtrack> defaultPlayList;
-    private static  MediaMetadataRetriever retriever;
+    private static PlayList<Soundtrack> defaultPlayList;
+    private static MediaMetadataRetriever retriever;
+    private static DbContext dbContext;
+    private static Context context;
 
-    public static List<Soundtrack> getPlayList(String listName){
+    public static PlayList<Soundtrack> getPlayList(String listName){
 
         return playLists.get(listName);
 
     }
 
-    public static void Initialize(){
+    public static void Initialize(Context context){
 
+        fileNames = new ArrayList<>();
+        playLists = new HashMap<>();
         retriever = new MediaMetadataRetriever();
+        DataController.context = context;
 
-        setDefaultPlayList();
+        dbContext = new DbContext(context);
+        boolean existingDB = dbContext.OpenOrCreateDB();
+
+        setFileNames();
+        initListNames();
+        setDefaultPlayList(existingDB);
 
 
-
-
+        count+=0;
+        int a =5;
+        if(defaultPlayList.equals(fileNames))
+            a =5;
 
 
     }
 
-    private static void setDefaultPlayList(){
+    private static void initListNames(){
+        try {
+            playsistsNames = dbContext.getPlaysistsNames();
+        }
+        catch (Exception e){
+            Log.d(e.getCause().toString(), e.getMessage());
+        }
+    }
+
+    private static void setDefaultPlayList(boolean bdExist){
         //TODO add if db exist - read default from it
         //if db exist - read default play list from if
-        if(false){
-
+        if(bdExist){
+            try {
+                defaultPlayList = dbContext.getPlaylist("default");
+            }
+            catch (Exception e){
+                Log.d(e.getCause().toString(), e.getMessage());
+            }
         }
-        //if db is not exist or has`t info about play lists children
+        //if db is not exist
         else {
 
-            for (File file:
-                    Environment.getExternalStorageDirectory().listFiles()) {
-                getFiles(Environment.getExternalStorageDirectory(), file.getName());
-            }
-
-            playLists.put("default", new ArrayList<>());
+            playLists.put("default", new PlayList<>("default"));
             defaultPlayList = playLists.get("default");
 
-            for (String name:
-                    fileNames) {
-
-                addSoundtrackToPlayList(name, defaultPlayList);
-
-            }
+            try{dbContext.insertPlayList(defaultPlayList.getListName());}
+            catch (SQLiteException e){}
         }
+
+
+        addAllFiles();
+        int a = dbContext.SongsDBCount();
+        a++;
     }
 
 
@@ -80,7 +112,7 @@ public final class DataController {
              playsistsNames) {
 
             if(!playList.equals("default")){
-                playLists.put(playList, new ArrayList<>());
+                playLists.put(playList, new PlayList<>(playList));
 
                 //TODO add soundtracks to play list from default list
             }
@@ -89,7 +121,7 @@ public final class DataController {
 
     }
 
-    public static void addSoundtrackToPlayList(String name, List<Soundtrack> playList){
+    public static Soundtrack addSoundtrackToPlayList(String name, List<Soundtrack> playList){
 
         Soundtrack soundtrack = new Soundtrack(name);
 
@@ -103,26 +135,39 @@ public final class DataController {
         soundtrack.setTittle(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
         soundtrack.setDate(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE));
 
-        byte[] bytes = retriever.getEmbeddedPicture();
-
+        byte[] bytes = null;
+        try {
+            bytes = retriever.getEmbeddedPicture();
+        }
+        catch (Exception e){
+            Log.d(e.getLocalizedMessage(), e.getMessage());
+        }
         if(bytes != null){
             InputStream inputStream= new ByteArrayInputStream(bytes);
             Bitmap image = BitmapFactory.decodeStream(inputStream);
             soundtrack.setImage(image);
         }
-        else {
 
-        }
 
         playList.add(soundtrack);
+        return soundtrack;
     }
 
     private static void setPlaysistsNames(){}
 
+    private static int count = 0;
     private static void getFiles(File dir, String name){
 
+        /*count++;
+        if(fileNames.contains(name))
+            return;*/
+
         if(name.endsWith(".mp3") || name.endsWith(".MP3")){
-            fileNames.add(dir.getAbsolutePath()+"/"+name);
+            String filename = dir.getAbsolutePath()+"/"+name;
+
+            //if(file size > 750KB)
+            if(((new File(filename)).length() / 1024) > 953)
+                fileNames.add(filename);
             return;
         }
         File file = new File(dir.getAbsolutePath()+"/"+name);
@@ -132,6 +177,31 @@ public final class DataController {
             for (File subfile:
                     file.listFiles()) {
                 getFiles(file, subfile.getName());
+            }
+        }
+    }
+
+    private static void setFileNames(){
+        for (File file:
+                Environment.getExternalStorageDirectory().listFiles()) {
+            getFiles(Environment.getExternalStorageDirectory(), file.getName());
+        }
+    }
+
+    private static void addAllFiles(){
+        for (String name:
+                fileNames) {
+
+            boolean cont = true;
+            for (Soundtrack soundtrack1 : defaultPlayList) {
+                if (soundtrack1.getName().equals(name)){
+                    cont = !cont;
+                }
+            }
+            if(cont) {
+                String tmp = defaultPlayList.getListName();
+                Soundtrack soundtrack = addSoundtrackToPlayList(name, defaultPlayList);
+                dbContext.insertSoundtrack(soundtrack, defaultPlayList.getListName());
             }
         }
     }

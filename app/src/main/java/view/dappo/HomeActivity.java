@@ -55,7 +55,7 @@ public class HomeActivity extends AppCompatActivity {
         requestForPermissions();
 
 
-        mainController = new MainController();
+        mainController = new MainController(this);
         languageController = new LanguageController(getResources());
 
         listView = findViewById(R.id.lvLang);
