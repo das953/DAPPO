@@ -13,19 +13,26 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import Controller.dappo.*;
 import Model.dappo.AppLocales;
+import Model.dappo.PlayList;
+import Model.dappo.PlayerAction;
+import Model.dappo.Soundtrack;
+import view.dappo.SoundTracks.SoundTracksContent;
 
 
 /**
  * Base activity of Das Audio Player With Photo Option :)
  */
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements SoundtracksFragment.OnListFragmentInteractionListener {
 
     //Permissions
     public final String[] EXTERNAL_PERMS =
@@ -38,18 +45,24 @@ public class HomeActivity extends AppCompatActivity {
     MainController mainController;
     LanguageController languageController;
 
+    //Language adapter
     ArrayAdapter<String> adapter;
 
-    TextView hello;
-    int switcher;
+    //Current Soundtrack
+    SoundTracksContent.SoundtrackItem currentItem;
 
-    ListView listView;
+    //Navigation buttons
+    Button btnPrev;
+    Button btnPlay;
+    Button btnNext;
+
+    //Current state
+    PlayerAction playerAction;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
 
         requestForPermissions();
@@ -58,26 +71,11 @@ public class HomeActivity extends AppCompatActivity {
         mainController = new MainController(this);
         languageController = new LanguageController(getResources());
 
-        listView = findViewById(R.id.lvLang);
-        hello = findViewById(R.id.tvHello);
-        switcher = 0;
 
         Initialize();
 
 
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView item =  view.findViewById(R.id.itemText);
-                String text = item.getText().toString();
-                Locale locale = AppLocales.valueOf(text).getLocale();
-                languageController.setLanguage(locale);
-                Initialize();
-            }
-        });
-
-
+        setContentView(R.layout.activity_home);
     }
 
     /**
@@ -85,22 +83,33 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void Initialize(){
 
+        playerAction = PlayerAction.PAUSE;
+
+        btnPrev = findViewById(R.id.btnPrev);
+        btnPlay = findViewById(R.id.btnPlay);
+        btnNext = findViewById(R.id.btnNext);
+
+        btnPlay.setOnClickListener(v -> {PlayPause(PlayerAction.PLAY);});
+
         if(adapter == null){
-            adapter = new ArrayAdapter<String>(this, R.layout.lang_list_item , R.id.itemText,
+            //set ListView through ArrayAdapter<String>
+          /*  adapter = new ArrayAdapter<String>(this, R.layout.lang_list_item , R.id.itemText,
                     languageController.getLanguageArray());
 
-            listView.setAdapter(adapter);
+            listView.setAdapter(adapter);*/
 
             Locale locale = AppLocales.valueOf(mainController.getSettings().getLanguage()).getLocale();
             languageController.setLanguage(locale);
         }
 
-        hello.setText(R.string.Hello);
-
-
+        //hello.setText(R.string.Hello);
 
     }
 
+
+    /**
+     * For permissions
+     */
     public boolean canAccessExternalSd() {
         return (hasPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE));
     }
@@ -125,7 +134,19 @@ public class HomeActivity extends AppCompatActivity {
         return isPermissionOn;
     }
 
+    @Override
+    public void onListFragmentInteraction(SoundTracksContent.SoundtrackItem item) {
+        currentItem = item;
+    }
 
+    private void PlayPause(PlayerAction action){
 
+        switch (action){
 
+        }
+
+    }
 }
+
+
+

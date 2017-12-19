@@ -2,23 +2,8 @@ package Model.dappo;
 
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -27,27 +12,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
-import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.UserHandle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.Display;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by das953 on 18-Dec-17.
@@ -93,20 +65,18 @@ public class DbContext extends SQLiteOpenHelper{
                 "album, image, date) " +
                 "values(?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        statement.bindString(1, soundtrack.getName() != null ? soundtrack.getName() : "");
-        statement.bindString(2, soundtrack.getBitrate() != null ? soundtrack.getBitrate() : "");
-        statement.bindString(3, soundtrack.getDuration() != null ? soundtrack.getDuration() : "");
-        statement.bindString(4, soundtrack.getAuthor() != null ? soundtrack.getAuthor() : "");
-        statement.bindString(5, soundtrack.getTittle() != null ? soundtrack.getTittle() : "");
-        statement.bindString(6, soundtrack.getArtist() != null ? soundtrack.getArtist() : "");
-        statement.bindString(7, soundtrack.getAlbum() != null ? soundtrack.getAlbum() : "");
-        byte[] imageBytes = getImageBytes(soundtrack.getImage());
-        if (imageBytes == null)
+        statement.bindString(1, soundtrack.getName()        != null ? soundtrack.getName() : "");
+        statement.bindString(2, soundtrack.getBitrate()     != null ? soundtrack.getBitrate() : "");
+        statement.bindString(3, soundtrack.getDuration()    != null ? soundtrack.getDuration() : "");
+        statement.bindString(4, soundtrack.getAuthor()      != null ? soundtrack.getAuthor() : "");
+        statement.bindString(5, soundtrack.getTittle()      != null ? soundtrack.getTittle() : "");
+        statement.bindString(6, soundtrack.getArtist()      != null ? soundtrack.getArtist() : "");
+        statement.bindString(7, soundtrack.getAlbum()       != null ? soundtrack.getAlbum() : "");
+
+        if (soundtrack.getImage() == null)
             statement.bindLong(8, 0);
         else
             statement.bindLong(8, 1);
-
-             /*statement.bindBlob(8, imageBytes);*/
 
         statement.bindString(9, soundtrack.getDate() != null ? soundtrack.getDate() : "");
 
@@ -263,7 +233,8 @@ public class DbContext extends SQLiteOpenHelper{
                 byte[] bytes = retriever.getEmbeddedPicture();
 
                 InputStream inputStream = new ByteArrayInputStream(bytes);
-                Bitmap image = BitmapFactory.decodeStream(inputStream);
+                //Bitmap image = BitmapFactory.decodeStream(inputStream);
+                Drawable image = Drawable.createFromStream(inputStream, null);
                 soundtrack.setImage(image);
 
                /* byte[] imageByte =

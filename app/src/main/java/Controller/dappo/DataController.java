@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadata;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
@@ -84,6 +85,7 @@ public final class DataController {
         if(bdExist){
             try {
                 defaultPlayList = dbContext.getPlaylist("default");
+                playLists.put("default", defaultPlayList);
             }
             catch (Exception e){
                 Log.d(e.getCause().toString(), e.getMessage());
@@ -92,11 +94,14 @@ public final class DataController {
         //if db is not exist
         else {
 
-            playLists.put("default", new PlayList<>("default"));
-            defaultPlayList = playLists.get("default");
-
+            defaultPlayList = new PlayList<>("default");
+            //playLists.get("default");
             try{dbContext.insertPlayList(defaultPlayList.getListName());}
             catch (SQLiteException e){}
+            playLists.put("default", defaultPlayList);
+
+
+
         }
 
 
@@ -106,7 +111,7 @@ public final class DataController {
     }
 
 
-    private static void setPlayLists(){
+   /* private static void setPlayLists(){
 
         for (String playList:
              playsistsNames) {
@@ -119,7 +124,7 @@ public final class DataController {
 
         }
 
-    }
+    }*/
 
     public static Soundtrack addSoundtrackToPlayList(String name, List<Soundtrack> playList){
 
@@ -144,10 +149,9 @@ public final class DataController {
         }
         if(bytes != null){
             InputStream inputStream= new ByteArrayInputStream(bytes);
-            Bitmap image = BitmapFactory.decodeStream(inputStream);
+            Drawable image = Drawable.createFromStream(inputStream, null);
             soundtrack.setImage(image);
         }
-
 
         playList.add(soundtrack);
         return soundtrack;
@@ -204,5 +208,16 @@ public final class DataController {
                 dbContext.insertSoundtrack(soundtrack, defaultPlayList.getListName());
             }
         }
+    }
+
+
+    public static Map<String, PlayList<Soundtrack>> getPlayLists() {
+        if(playLists.size() == 0 || defaultPlayList.size() == 0){
+            setDefaultPlayList(dbContext.OpenOrCreateDB());
+        }
+
+
+
+        return playLists;
     }
 }

@@ -24,6 +24,7 @@ import java.util.Map;
 
 import Model.dappo.AppSettings;
 import Model.dappo.DbContext;
+import Model.dappo.PlayList;
 import Model.dappo.Soundtrack;
 
 /**
@@ -37,6 +38,8 @@ public class MainController {
     private ArrayList<String> playsistsNames;
     private Map<String , ArrayList<Soundtrack>> playLists;
     private Context context;
+    private static PlayList<Soundtrack> CurrentPlayList;
+
 
 
     public MainController(Context context) {
@@ -69,7 +72,15 @@ public class MainController {
 
     }
 
+    public static PlayList<Soundtrack> getCurrentPlayList() {
+        return CurrentPlayList;
+    }
 
+    public static void setCurrentPlayList(PlayList<Soundtrack> currentPlayList) {
+        CurrentPlayList = currentPlayList;
+    }
 
-
+    public Map<String, ArrayList<Soundtrack>> getPlayLists() {
+        return playLists;
+    }
 }

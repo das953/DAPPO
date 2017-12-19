@@ -5,6 +5,7 @@ package Model.dappo;
  */
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 
 import java.io.File;
 
@@ -21,7 +22,7 @@ public class Soundtrack {
     private String tittle;
     private String artist;
     private String album;
-    private Bitmap image;
+    private Drawable image;
     private String date;
 
     public Soundtrack(String name) {
@@ -80,11 +81,11 @@ public class Soundtrack {
         this.album = album;
     }
 
-    public Bitmap getImage() {
+    public Drawable getImage() {
         return image;
     }
 
-    public void setImage(Bitmap image) {
+    public void setImage(Drawable image) {
         this.image = image;
     }
 
